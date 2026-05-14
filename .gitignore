@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Dataset files (download via setup script)
+dataset/
+
+# Model outputs
+outputs/models/
+outputs/predictions/
+outputs/eigenfaces/
+outputs/graphs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/
+
+# OS
+Thumbs.db
+.DS_Store
