@@ -48,5 +48,5 @@ def load_dataset(train_dir, test_dir):
 def load_imposter_images(imposter_dir, img_size=IMG_SIZE):
     imgs, _, fnames = load_images_from_folder(imposter_dir)
     if len(imgs) == 0:
-        return np.array([])
+        return np.array([]), []
     return np.array(imgs, dtype=np.float64), fnames

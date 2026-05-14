@@ -5,26 +5,32 @@ class PCA:
         self.n_components = n_components
         self.mean_face = None
         self.eigenvectors = None
-        self.eigenvalues = None
-        self.explained_variance_ratio = None
+        self.eigenvalue_ratios = None
 
     def fit(self, X):
+        n_samples, n_features = X.shape
         self.mean_face = np.mean(X, axis=0)
         delta = X - self.mean_face
 
-        # Surrogate covariance: C = delta.T @ delta (p x p matrix)
-        C = delta.T @ delta
-        eigenvalues, eigenvectors = np.linalg.eig(C)
+        # Use small surrogate covariance: C = delta @ delta.T (n_samples x n_samples)
+        # Eigenvectors of original covariance can be recovered via: delta.T @ v_small
+        C_small = delta @ delta.T
+        eigenvalues_small, eigenvectors_small = np.linalg.eig(C_small)
 
-        eigenvalues = np.real(eigenvalues)
-        eigenvectors = np.real(eigenvectors)
+        eigenvalues = np.real(eigenvalues_small)
+        eigenvectors_small = np.real(eigenvectors_small)
 
         idx = np.argsort(eigenvalues)[::-1]
         eigenvalues = eigenvalues[idx]
-        eigenvectors = eigenvectors[:, idx]
+        eigenvectors_small = eigenvectors_small[:, idx]
 
-        # Normalize eigenvectors to unit length
-        eigenvectors = eigenvectors / np.linalg.norm(eigenvectors, axis=0, keepdims=True)
+        # Recover original eigenvectors: U = delta.T @ V_small
+        eigenvectors = delta.T @ eigenvectors_small
+
+        # Normalize to unit length
+        norms = np.linalg.norm(eigenvectors, axis=0, keepdims=True)
+        norms[norms == 0] = 1
+        eigenvectors = eigenvectors / norms
 
         self.eigenvalues = eigenvalues
         self.eigenvectors = eigenvectors
@@ -32,13 +38,13 @@ class PCA:
         total = np.sum(eigenvalues)
         self.explained_variance_ratio = eigenvalues / total if total > 0 else np.zeros_like(eigenvalues)
 
-        if self.n_components is not None:
+        if self.n_components is not None and self.n_components < self.eigenvectors.shape[1]:
             self.eigenvectors = self.eigenvectors[:, :self.n_components]
             self.eigenvalues = self.eigenvalues[:self.n_components]
             self.explained_variance_ratio = self.explained_variance_ratio[:self.n_components]
 
-        print(f"[PCA] Fitted with {self.eigenvectors.shape[1]} components")
-        print(f"[PCA] Explained variance: {np.sum(self.explained_variance_ratio):.4f}")
+        print(f"[PCA] Fitted with {self.eigenvectors.shape[1]} components | "
+              f"Explained variance: {np.sum(self.explained_variance_ratio):.4f}")
         return self
 
     def transform(self, X):
@@ -52,9 +58,10 @@ class PCA:
     def inverse_transform(self, X_proj):
         return X_proj @ self.eigenvectors.T + self.mean_face
 
-    def get_eigenfaces(self, height=64, width=64):
+    def get_eigenfaces(self, height=64, width=64, max_faces=20):
         ef = []
-        for i in range(min(20, self.eigenvectors.shape[1])):
+        n = min(max_faces, self.eigenvectors.shape[1])
+        for i in range(n):
             ev = self.eigenvectors[:, i]
             ev_min, ev_max = ev.min(), ev.max()
             if ev_max - ev_min > 0:

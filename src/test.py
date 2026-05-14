@@ -66,8 +66,8 @@ def test_folder(folder_path, pca, ann, label_map, save_dir="outputs/predictions"
 def test_imposters(imposter_dir, pca, ann, save_dir="outputs/predictions"):
     ensure_dir(save_dir)
     X_imp, imp_files = load_imposter_images(imposter_dir)
-    if X_imp.shape[0] == 0:
-        print("[INFO] No imposter images found.")
+    if not isinstance(X_imp, np.ndarray) or X_imp.size == 0 or X_imp.shape[0] == 0:
+        print("[INFO] No imposter images found. Skipping imposter detection.")
         return {}
 
     X_imp_pca = pca.transform(X_imp)
