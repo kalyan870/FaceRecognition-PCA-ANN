@@ -1,68 +1,46 @@
-import os
-import sys
-import argparse
-
-sys.path.insert(0, os.path.dirname(__file__))
-
-from src.train import train_pipeline
-from src.test import test_folder, test_imposters, test_single_image
-from src.preprocess import load_dataset
-from src.utils import ensure_dir
+import streamlit as st
+import cv2
+import numpy as np
 import joblib
+from PIL import Image
 
-def main():
-    parser = argparse.ArgumentParser(description='Face Recognition using PCA + ANN')
-    parser.add_argument('--mode', type=str, default='full',
-                        choices=['train', 'test', 'full'],
-                        help='Operation mode')
-    parser.add_argument('--train_dir', type=str, default='dataset/train',
-                        help='Training dataset directory')
-    parser.add_argument('--test_dir', type=str, default='dataset/test',
-                        help='Testing dataset directory')
-    parser.add_argument('--imposter_dir', type=str, default='dataset/imposters',
-                        help='Imposter images directory')
-    parser.add_argument('--image', type=str, default=None,
-                        help='Single image path for testing')
-    parser.add_argument('--k_values', type=int, nargs='+', default=[5, 10, 20, 30, 40],
-                        help='k values for PCA')
-    parser.add_argument('--best_k', type=int, default=None,
-                        help='Use specific k value for training')
-    args = parser.parse_args()
+MODEL_PATH = "model.pkl"
+PCA_PATH = "pca.pkl"
+LABELS_PATH = "labels.pkl"
 
-    ensure_dir('outputs/graphs')
-    ensure_dir('outputs/eigenfaces')
-    ensure_dir('outputs/predictions')
-    ensure_dir('outputs/models')
+st.set_page_config(page_title="PCA + ANN Face Recognition", layout="centered")
 
-    if args.mode in ('full', 'train'):
-        print("=" * 60)
-        print("FACE RECOGNITION SYSTEM - PCA + ANN")
-        print("=" * 60)
-        best_pca, best_ann, label_map, k_values, accuracies = train_pipeline(
-            args.train_dir, args.test_dir, args.k_values
-        )
-        print(f"\n[INFO] Final model saved to outputs/models/")
+st.title("PCA + ANN Face Recognition")
+st.write("Upload a face image to recognize the person.")
 
-    if args.mode in ('full', 'test'):
-        print("\n" + "=" * 60)
-        print("TESTING PHASE")
-        print("=" * 60)
+try:
+    classifier = joblib.load(MODEL_PATH)
+    pca = joblib.load(PCA_PATH)
+    label_names, _, _, _, _ = joblib.load(LABELS_PATH)
+    st.success("Model loaded successfully!")
+except Exception as e:
+    st.error(f"Error loading model: {e}")
+    st.stop()
 
-        if os.path.exists('outputs/models/final_pca.joblib'):
-            pca = joblib.load('outputs/models/final_pca.joblib')
-            ann = joblib.load('outputs/models/final_ann.joblib')
-            _, _, _, _, label_map, _, _ = load_dataset(args.train_dir, args.test_dir)
-        else:
-            print("[ERROR] No trained model found. Run with --mode train first.")
-            return
+uploaded_file = st.file_uploader("Choose a face image...", type=["jpg", "jpeg", "png"])
 
-        if args.image:
-            test_single_image(args.image, pca, ann, label_map)
-        else:
-            test_folder(args.test_dir, pca, ann, label_map)
+if uploaded_file is not None:
+    image = Image.open(uploaded_file).convert('L')
+    img_array = np.array(image)
+    img_resized = cv2.resize(img_array, (100, 100)).flatten().reshape(1, -1)
+    img_pca = pca.transform(img_resized)
+    prediction = classifier.predict(img_pca)[0]
+    probabilities = classifier.predict_proba(img_pca)[0]
+    confidence = np.max(probabilities) * 100
 
-        if os.path.exists(args.imposter_dir):
-            test_imposters(args.imposter_dir, pca, ann)
+    pred_name = label_names[prediction]
 
-if __name__ == '__main__':
-    main()
+    st.image(image, caption="Uploaded Image", width=250, channels="GRAY")
+    st.success(f"**Predicted Person:** {pred_name}")
+    st.info(f"**Confidence:** {confidence:.2f}%")
+
+    st.subheader("Class Probabilities")
+    prob_dict = {label_names[i]: float(probabilities[i]) for i in range(len(label_names))}
+    sorted_probs = sorted(prob_dict.items(), key=lambda x: x[1], reverse=True)
+    for name, prob in sorted_probs:
+        st.write(f"{name}: {prob*100:.2f}%")
