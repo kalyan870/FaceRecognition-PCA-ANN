@@ -1,4 +1,4 @@
-# PCA + ANN Face Recognition System
+# PCA + ANN Face Recognition System using Machine Learning
 
 ## Overview
 This project implements a Face Recognition System using Principal Component Analysis (PCA) and Artificial Neural Network (ANN).
