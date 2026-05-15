@@ -26,15 +26,17 @@ https://github.com/kalyan870/FaceRecognition-PCA-ANN
 
 ## Output Screenshots
 
-### Home UI
-![Home UI](outputs/predictions/app_working.png)
+### UI Screenshot
+![UI](screenshots/ui.png)
+
+### Prediction Result
+![Prediction](screenshots/prediction.png)
 
 ### Accuracy Graph
-![Accuracy Graph](outputs/graphs/accuracy_graph.png)
+![Accuracy Graph](screenshots/accuracy_graph.png)
 
 ### Eigenfaces
-![Eigenface 0](outputs/eigenfaces/eigenface_0.png)
-![Eigenface 1](outputs/eigenfaces/eigenface_1.png)
+![Eigenface](screenshots/eigenface_0.png)
 
 ### Training Output
 ```
