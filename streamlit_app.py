@@ -6,7 +6,7 @@ import os
 
 model = joblib.load("model.pkl")
 pca = joblib.load("pca.pkl")
-label_names = joblib.load("labels.pkl")
+label_names = list(joblib.load("labels.pkl"))
 
 st.set_page_config(page_title="PCA + ANN Face Recognition", layout="wide")
 
