@@ -1,5 +1,4 @@
 import streamlit as st
-import cv2
 import numpy as np
 import joblib
 from PIL import Image
@@ -26,8 +25,7 @@ uploaded_file = st.file_uploader("Choose a face image...", type=["jpg", "jpeg", 
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert('L')
-    img_array = np.array(image)
-    img_resized = cv2.resize(img_array, (100, 100)).flatten().reshape(1, -1)
+    img_resized = np.array(image.resize((100, 100))).flatten().reshape(1, -1)
     img_pca = pca.transform(img_resized)
     prediction = classifier.predict(img_pca)[0]
     probabilities = classifier.predict_proba(img_pca)[0]
@@ -35,7 +33,7 @@ if uploaded_file is not None:
 
     pred_name = label_names[prediction]
 
-    st.image(image, caption="Uploaded Image", width=250, channels="GRAY")
+    st.image(image, caption="Uploaded Image", width=250)
     st.success(f"**Predicted Person:** {pred_name}")
     st.info(f"**Confidence:** {confidence:.2f}%")
 

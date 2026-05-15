@@ -1,7 +1,7 @@
 import os
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
@@ -34,11 +34,13 @@ def load_images(dataset_path):
         label_names.append(person_name)
         for img_name in os.listdir(person_dir):
             img_path = os.path.join(person_dir, img_name)
-            img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-            if img is not None:
-                img_resized = cv2.resize(img, (100, 100)).flatten()
+            try:
+                img = Image.open(img_path).convert('L')
+                img_resized = np.array(img.resize((100, 100))).flatten()
                 images.append(img_resized)
                 labels.append(len(label_names) - 1)
+            except Exception:
+                pass
     print(f"Loaded {len(images)} images from {len(label_names)} subjects.")
     return np.array(images), np.array(labels), label_names
 

@@ -34,3 +34,8 @@ outputs/graphs/
 # OS
 Thumbs.db
 .DS_Store
+streamlit_auth.json
+deploy_page.png
+*.pkl
+__pycache__/
+dataset/
