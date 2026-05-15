@@ -1,55 +1,83 @@
-# PCA + ANN Face Recognition
+# PCA + ANN Face Recognition System
 
-Face recognition system using Principal Component Analysis (PCA) for dimensionality reduction and Artificial Neural Network (ANN) for classification.
+Built and deployed a PCA + ANN Face Recognition System using Python, OpenCV, Scikit-learn, and Streamlit.
+
+The project performs facial recognition using Principal Component Analysis (PCA) for dimensionality reduction and an Artificial Neural Network (ANN) for classification.
+
+## Features
+
+- Real-time image prediction
+- PCA-based feature extraction
+- ANN classification model
+- Streamlit deployment
+- Accuracy graph visualization
+- Eigenfaces generation
+
+## Tech Stack
+
+Python, OpenCV, Scikit-learn, Streamlit, NumPy, Matplotlib, Joblib, Pillow
 
 ## Project Structure
 
 ```
 FaceRecognition_PCA_ANN/
-├── dataset/faces/          # Face images organized in subfolders per person
+├── dataset/faces/          # Face images organized by person
+│   ├── Kalyan/
+│   ├── Rahul/
+│   ├── Suresh/
+│   ├── Priya/
+│   ├── Ananya/
+│   └── Vikram/
 ├── outputs/
-│   ├── eigenfaces/         # Generated eigenface visualizations
-│   ├── graphs/             # Accuracy vs K components plot
-│   └── predictions/        # Sample predictions and classification report
-├── app.py                  # Streamlit web application
+│   ├── graphs/             # Accuracy graph
+│   ├── eigenfaces/         # Eigenface visualizations
+│   └── predictions/        # Sample predictions
+├── streamlit_app.py        # Streamlit web application
 ├── train_model.py          # Training script
 ├── model.pkl               # Trained ANN classifier
 ├── pca.pkl                 # Fitted PCA model
-├── labels.pkl              # Label encoder and test data
+├── labels.pkl              # Label encoder
 ├── requirements.txt        # Python dependencies
+├── runtime.txt             # Python version for Streamlit Cloud
 └── README.md
 ```
 
-## Setup
+## Results
 
-1. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+### Home UI
+![Home UI](outputs/predictions/app_working.png)
 
-2. Place face images in `dataset/faces/` — one subfolder per person:
-   ```
-   dataset/faces/
-   ├── person1/
-   │   ├── img1.jpg
-   │   └── img2.jpg
-   └── person2/
-       ├── img1.jpg
-       └── img2.jpg
-   ```
+### Accuracy Graph
+![Accuracy Graph](outputs/graphs/accuracy_graph.png)
 
-3. Train the model:
-   ```
-   python train_model.py
-   ```
+### Eigenfaces
+![Eigenface 0](outputs/eigenfaces/eigenface_0.png)
+![Eigenface 1](outputs/eigenfaces/eigenface_1.png)
 
-4. Run the Streamlit app:
-   ```
-   streamlit run app.py
-   ```
+### Training Output
+```
+Loading Dataset...
+Total Images Loaded: 60
+Applying PCA...
+Training ANN Model...
+Model Accuracy: 100.00%
+Model Saved Successfully!
+Accuracy Graph Saved!
+Eigenfaces Saved!
+Training Completed Successfully!
+```
 
 ## How It Works
 
-- **PCA** reduces face image dimensions from 10,000 (100x100) to k components
-- **ANN (MLPClassifier)** classifies the reduced features into person labels
-- Tests k values [10, 20, 30, 40, 50] and selects the best accuracy
+1. **Dataset**: 60 face images of 6 persons (10 each) from the Olivetti faces dataset
+2. **PCA**: Reduces 10,000-dimensional image space to 39 principal components
+3. **ANN**: MLPClassifier with 100 hidden neurons trains on PCA-reduced features
+4. **Prediction**: Uploaded image goes through same PCA transform, classified by ANN
+
+## Deployment
+
+Live Demo: [https://appapppy-82gfkkrhjfskrpay5mtyqz.streamlit.app/](https://appapppy-82gfkkrhjfskrpay5mtyqz.streamlit.app/)
+
+## License
+
+MIT
