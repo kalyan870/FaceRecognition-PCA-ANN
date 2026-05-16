@@ -39,3 +39,12 @@ deploy_page.png
 *.pkl
 __pycache__/
 dataset/
+
+src/
+notebooks/
+Dockerfile
+setup.py
+prepare_dataset.py
+*.zip
+deploy_page.png
+streamlit_auth.json
