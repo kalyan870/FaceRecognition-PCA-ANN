@@ -24,9 +24,6 @@ https://appapppy-82gfkkrhjfskrpay5mtyqz.streamlit.app/
 ## GitHub Repository
 https://github.com/kalyan870/FaceRecognition-PCA-ANN
 
-## Architecture
-[View Architecture Documentation](ARCHITECTURE.md)
-
 ## Output Screenshots
 
 ### UI Screenshot
