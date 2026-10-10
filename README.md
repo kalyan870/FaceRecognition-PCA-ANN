@@ -4,6 +4,12 @@
 
 <p align="center">Python · OpenCV · NumPy · scikit-learn · Streamlit</p>
 
+## Live demo
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://appapppy-82gfkkrhjfskrpay5mtyqz.streamlit.app/)
+
+**[Launch the PCA + ANN face-recognition app →](https://appapppy-82gfkkrhjfskrpay5mtyqz.streamlit.app/)**
+
 ## Project overview
 
 This repository contains a dataset preparation pipeline, PCA/ANN training code, saved model artifacts, visual outputs, and a Streamlit interface. The implementation is intended for experimentation with a fixed set of known identities.
@@ -48,7 +54,7 @@ streamlit run streamlit_app.py
 
 ## Architecture and results
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the repository's architecture notes and the [`screenshots/`](screenshots/) directory for saved UI, prediction, and evaluation images. The [Streamlit demo](https://appapppy-82gfkkrhjfskrpay5mtyqz.streamlit.app/) is linked from the existing project page; availability can change.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the repository's architecture notes and the [`screenshots/`](screenshots/) directory for saved UI, prediction, and evaluation images. Open the [live Streamlit demo](https://appapppy-82gfkkrhjfskrpay5mtyqz.streamlit.app/). The app may take a moment to wake if the hosting service has been idle.
 
 The README's historical training output is a recorded run, not a guarantee of accuracy on new people or camera conditions. Face recognition is biometric processing: use consented data, protect the dataset and model files, and do not treat this classroom prototype as an access-control system.
 
