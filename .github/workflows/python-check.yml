@@ -17,4 +17,6 @@ jobs:
         with:
           python-version: '3.11'
       - name: Compile application
-        run: python -m py_compile app.py
+        run: python -m py_compile app.py streamlit_app.py prepare_dataset.py src/runtime.py src/archive_safety.py
+      - name: Run dependency-free runtime tests
+        run: python -m unittest discover -s tests -p test_runtime.py -v

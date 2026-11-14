@@ -5,8 +5,8 @@ Organizes into train/test (60/40 split) under dataset/.
 import os
 import shutil
 import urllib.request
-import zipfile
 from sklearn.model_selection import train_test_split
+from src.archive_safety import extract_zip_safely
 
 DATASET_URL = "https://github.com/robaita/introduction_to_machine_learning/raw/main/dataset.zip"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,8 +30,7 @@ def main():
     extract_dir = os.path.join(BASE_DIR, "dataset_extracted")
     if not os.path.exists(extract_dir):
         print("[INFO] Extracting...")
-        with zipfile.ZipFile(zip_path, 'r') as zf:
-            zf.extractall(extract_dir)
+        extract_zip_safely(zip_path, extract_dir)
         print("[INFO] Extraction complete.")
 
     # Find faces directory
