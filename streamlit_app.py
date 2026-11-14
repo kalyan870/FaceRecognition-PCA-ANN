@@ -3,19 +3,30 @@ import numpy as np
 import joblib
 from PIL import Image
 import os
-
-model = joblib.load("model.pkl")
-pca = joblib.load("pca.pkl")
-label_names = list(joblib.load("labels.pkl"))
+from src.runtime import normalize_label_names, square_image_size
 
 st.set_page_config(page_title="PCA + ANN Face Recognition", layout="wide")
+
+@st.cache_resource
+def load_artifacts():
+    return (
+        joblib.load("model.pkl"),
+        joblib.load("pca.pkl"),
+        normalize_label_names(joblib.load("labels.pkl")),
+    )
+
+
+try:
+    model, pca, label_names = load_artifacts()
+    image_side = square_image_size(int(pca.n_features_in_))
+except Exception as exc:
+    st.error(f"Could not load compatible model artifacts: {exc}")
+    st.stop()
 
 st.sidebar.title("Face Recognition System")
 st.sidebar.write("PCA + ANN based ML project")
 st.sidebar.markdown("---")
-st.sidebar.metric("Model Accuracy", "100%")
-st.sidebar.metric("Total Persons", str(len(label_names)))
-st.sidebar.metric("Images per Person", "10")
+st.sidebar.metric("Known Classes", str(len(label_names)))
 st.sidebar.markdown("---")
 st.sidebar.markdown("### Dataset Classes")
 for name in label_names:
@@ -39,7 +50,7 @@ with col1:
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("L")
-    image = np.array(image.resize((100, 100)))
+    image = np.array(image.resize((image_side, image_side)))
 
     with col1:
         st.image(image, caption="Uploaded Image", width=250)
@@ -47,7 +58,11 @@ if uploaded_file is not None:
     image_flatten = image.flatten().reshape(1, -1)
     image_pca = pca.transform(image_flatten)
     prediction = model.predict(image_pca)
-    predicted_person = label_names[prediction[0]]
+    class_index = int(prediction[0])
+    if class_index < 0 or class_index >= len(label_names):
+        st.error("The model prediction does not match the labels artifact.")
+        st.stop()
+    predicted_person = label_names[class_index]
 
     with col2:
         st.success(f"**Predicted Person:** {predicted_person}")

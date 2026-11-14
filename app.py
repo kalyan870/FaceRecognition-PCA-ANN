@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import joblib
 from PIL import Image
+from src.runtime import normalize_label_names, square_image_size
 
 # File Paths
 MODEL_PATH = "model.pkl"
@@ -19,20 +20,18 @@ st.set_page_config(
 st.title("PCA + ANN Face Recognition")
 st.write("Upload a face image to recognize the person.")
 
-# Load Models
+@st.cache_resource
+def load_artifacts():
+    return (
+        joblib.load(MODEL_PATH),
+        joblib.load(PCA_PATH),
+        normalize_label_names(joblib.load(LABELS_PATH)),
+    )
+
+
 try:
-    classifier = joblib.load(MODEL_PATH)
-    pca = joblib.load(PCA_PATH)
-
-    # Corrected labels loading
-    loaded_labels = joblib.load(LABELS_PATH)
-
-    # Handle tuple/list safely
-    if isinstance(loaded_labels, tuple) or isinstance(loaded_labels, list):
-        label_names = loaded_labels[0]
-    else:
-        label_names = loaded_labels
-
+    classifier, pca, label_names = load_artifacts()
+    image_side = square_image_size(int(pca.n_features_in_))
     st.success("Model loaded successfully!")
 
 except Exception as e:
@@ -55,7 +54,7 @@ if uploaded_file is not None:
     img_array = np.array(image)
 
     # Resize
-    img_resized = cv2.resize(img_array, (100, 100))
+    img_resized = cv2.resize(img_array, (image_side, image_side))
 
     # Flatten
     img_flatten = img_resized.flatten().reshape(1, -1)
@@ -73,7 +72,11 @@ if uploaded_file is not None:
     confidence = np.max(probabilities) * 100
 
     # Predicted Name
-    pred_name = label_names[prediction]
+    class_index = int(prediction)
+    if class_index < 0 or class_index >= len(label_names):
+        st.error("The model prediction does not match the labels artifact.")
+        st.stop()
+    pred_name = label_names[class_index]
 
     # Display Image
     st.image(
@@ -85,9 +88,12 @@ if uploaded_file is not None:
     # Results
     st.success(f"Predicted Person: {pred_name}")
     st.info(f"Confidence: {confidence:.2f}%")
+    st.caption("Prediction confidence is the classifier's probability estimate, not a validated real-world recognition accuracy.")
 
     # Probability Scores
     st.subheader("Class Probabilities")
 
     for i, prob in enumerate(probabilities):
-        st.write(f"{label_names[i]} : {prob * 100:.2f}%")
+        class_id = int(classifier.classes_[i])
+        if 0 <= class_id < len(label_names):
+            st.write(f"{label_names[class_id]} : {prob * 100:.2f}%")

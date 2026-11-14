@@ -2,11 +2,12 @@
 Download and organize the face dataset.
 """
 import os
-import zipfile
 import urllib.request
 import shutil
 
-DATASET_URL = "https://github.com/robaita/introduction_to_machine_learning/blob/main/dataset.zip"
+from src.archive_safety import extract_zip_safely
+
+DATASET_URL = "https://github.com/robaita/introduction_to_machine_learning/raw/main/dataset.zip"
 DATASET_ZIP = "dataset.zip"
 TRAIN_DIR = "dataset/train"
 TEST_DIR = "dataset/test"
@@ -27,8 +28,7 @@ def download_dataset():
 
     print("[INFO] Extracting dataset...")
     try:
-        with zipfile.ZipFile(DATASET_ZIP, 'r') as zf:
-            zf.extractall("dataset_raw")
+        extract_zip_safely(DATASET_ZIP, "dataset_raw")
     except Exception as e:
         print(f"[ERROR] Extraction failed: {e}")
         return False

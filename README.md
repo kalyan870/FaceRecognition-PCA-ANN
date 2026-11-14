@@ -31,9 +31,10 @@ flowchart LR
 
 - Dataset preparation and train/test folders
 - PCA feature projection and saved eigenface model
-- ANN-based identity classification
+- `MLPClassifier`-based identity classification in the root-level demo artifacts
 - Training and evaluation scripts
 - Streamlit interface and generated visualizations
+- ZIP path validation before extracting the downloaded dataset
 
 ## Run locally
 
@@ -46,17 +47,19 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Review `train_model.py` and `prepare_dataset.py` for the expected dataset layout and training options before regenerating model artifacts. Launch the interface with:
+Launch the checked-in model demo with:
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
+The root-level demo artifacts (`model.pkl`, `pca.pkl`, and `labels.pkl`) are loaded as trusted local joblib files. Do not replace them with artifacts from an untrusted source. `train_model.py` expects images under `dataset/faces/<identity>/`; `prepare_dataset.py` creates `dataset/train/` and `dataset/test/` for the separate custom pipeline under `src/`. The root training script and custom pipeline use different model implementations and input dimensions; keep each model paired with its own preprocessing and labels. Scikit-learn is pinned to the version recorded in the checked-in model artifacts to reduce serialization incompatibility.
+
 ## Architecture and results
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the repository's architecture notes and the [`screenshots/`](screenshots/) directory for saved UI, prediction, and evaluation images. Open the [live Streamlit demo](https://appapppy-82gfkkrhjfskrpay5mtyqz.streamlit.app/). The app may take a moment to wake if the hosting service has been idle.
 
-The README's historical training output is a recorded run, not a guarantee of accuracy on new people or camera conditions. Face recognition is biometric processing: use consented data, protect the dataset and model files, and do not treat this classroom prototype as an access-control system.
+The checked-in classification report is one historical evaluation run, not a guarantee of accuracy on new people or camera conditions. The interface no longer presents a hard-coded accuracy score. Face recognition is biometric processing: use consented data, protect the dataset and model files, and do not treat this classroom prototype as an access-control system.
 
 ## Project structure
 
